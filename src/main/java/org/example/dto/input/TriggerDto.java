@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.service.TriggerType;
 
 import javax.validation.constraints.NotBlank;
 
@@ -15,7 +16,7 @@ import javax.validation.constraints.NotBlank;
 public class TriggerDto {
 
     @NotBlank(message = "Trigger type is required")
-    private String type;
+    private TriggerType type;
 
     private String cronExpression;
 

@@ -136,7 +136,7 @@ public class MigrationOrchestrator {
     private Trigger convertToTrigger(JobDto job) {
         TriggerDto dto = job.getTrigger();
         return Trigger.builder()
-                .type(parseTriggerType(dto.getType()))
+                .type(dto.getType())
                 .jobName(job.getJobName())
                 .cronExpression(dto.getCronExpression())
                 .timezone(dto.getTimezone())
