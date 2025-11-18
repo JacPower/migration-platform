@@ -1,0 +1,210 @@
+{
+  "jobs": [
+    {
+      "jobId": 2001,
+      "jobName": "Backup_Production_Databases_Oracle",
+      "jobType": "BACKUP",
+      "system": "ORACLE",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 2 * * *",
+        "timezone": "UTC"
+      },
+      "dependencies": [],
+      "executionConstraints": {
+        "priority": 5,
+        "maxRuntimeMinutes": 120,
+        "excludeHolidays": false
+      },
+      "notes": "Standard daily backup of production Oracle databases"
+    },
+    {
+      "jobId": 3100,
+      "jobName": "Aggregate_Stuttgart_Assembly_Data",
+      "jobType": "TRANSFORM",
+      "system": "SAP",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 3 * * *",
+        "timezone": "Europe/Berlin"
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 2001,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 8,
+        "maxRuntimeMinutes": 60,
+        "excludeHolidays": false
+      },
+      "notes": "High priority - aggregates assembly line data from Stuttgart plant"
+    },
+    {
+      "jobId": 3200,
+      "jobName": "Reconcile_Parts_Inventory_SAP",
+      "jobType": "RECONCILE",
+      "system": "SAP",
+      "trigger": {
+        "type": "DEPENDENCY",
+        "upstreamJobId": 3100
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 3100,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 7,
+        "maxRuntimeMinutes": 45,
+        "excludeHolidays": false
+      },
+      "notes": "Reconciles parts inventory with assembly consumption"
+    },
+    {
+      "jobId": 4100,
+      "jobName": "Consolidate_Financials_SAP",
+      "jobType": "REPORT",
+      "system": "SAP",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 5 * * *",
+        "timezone": "UTC"
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 3200,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 10,
+        "maxRuntimeMinutes": 30,
+        "excludeHolidays": true
+      },
+      "notes": "Critical path - daily financial consolidation report. Hold on bank holidays."
+    },
+    {
+      "jobId": 4200,
+      "jobName": "Generate_Daily_Sales_Report",
+      "jobType": "REPORT",
+      "system": "SAP",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 6 * * *",
+        "timezone": "America/New_York"
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 4100,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 9,
+        "maxRuntimeMinutes": 20,
+        "excludeHolidays": true
+      },
+      "notes": "Daily sales report for management review"
+    },
+    {
+      "jobId": 5001,
+      "jobName": "Process_Incoming_Orders",
+      "jobType": "PROCESS",
+      "system": "SAP",
+      "trigger": {
+        "type": "FILE_WATCH",
+        "watchPath": "/data/incoming/orders",
+        "filePattern": "*.csv"
+      },
+      "dependencies": [],
+      "executionConstraints": {
+        "priority": 9,
+        "maxRuntimeMinutes": 15,
+        "excludeHolidays": false
+      },
+      "notes": "Processes incoming order files from EDI partners"
+    },
+    {
+      "jobId": 5002,
+      "jobName": "Manual_Data_Correction",
+      "jobType": "MAINTENANCE",
+      "system": "ORACLE",
+      "trigger": {
+        "type": "MANUAL"
+      },
+      "dependencies": [],
+      "executionConstraints": {
+        "priority": 3,
+        "maxRuntimeMinutes": 60,
+        "excludeHolidays": false
+      },
+      "notes": "Manual job for data corrections - run on demand by DBA team"
+    },
+    {
+      "jobId": 5003,
+      "jobName": "API_Webhook_Integration",
+      "jobType": "INTEGRATION",
+      "system": "CUSTOM",
+      "trigger": {
+        "type": "API",
+        "eventSource": "external_webhook",
+        "eventType": "order_received"
+      },
+      "dependencies": [],
+      "executionConstraints": {
+        "priority": 8,
+        "maxRuntimeMinutes": 10,
+        "excludeHolidays": false
+      },
+      "notes": "Triggered by external webhook from partner system"
+    },
+    {
+      "jobId": 6001,
+      "jobName": "Weekly_Archive_Cleanup",
+      "jobType": "MAINTENANCE",
+      "system": "ORACLE",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 1 * * 0",
+        "timezone": "UTC"
+      },
+      "dependencies": [],
+      "executionConstraints": {
+        "priority": 2,
+        "maxRuntimeMinutes": 180,
+        "excludeHolidays": false
+      },
+      "notes": "Weekly cleanup of archived data older than 90 days"
+    },
+    {
+      "jobId": 6002,
+      "jobName": "Monthly_Compliance_Report",
+      "jobType": "REPORT",
+      "system": "SAP",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 4 1 * *",
+        "timezone": "UTC"
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 4100,
+          "requiredStatus": "SUCCESS"
+        },
+        {
+          "dependsOnJobId": 4200,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 10,
+        "maxRuntimeMinutes": 60,
+        "excludeHolidays": false
+      },
+      "notes": "Monthly compliance report for regulatory submission"
+    }
+  ]
+}

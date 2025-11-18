@@ -1,5 +1,8 @@
 package org.example;
 
+import lombok.extern.slf4j.Slf4j;
+import org.example.orchestrator.MigrationOrchestrator;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,17 +10,30 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Slf4j
 public class Main {
-
-    private static final String API_URL = "https://api.redwood.com";
     private static final Path INPUT_FOLDER = Paths.get("src/main/resources/competitor-exports");
 
 
 
     public static void main(String[] args) throws Exception {
-        MigrationApplication app = new MigrationApplication(API_URL);
+        List<String> files = loadExportFiles();
 
-        //TODO: implement file processing logic
+        if (files.isEmpty()) {
+            log.error("No export files found in the input folder: {}", INPUT_FOLDER.toAbsolutePath());
+            return;
+        }
+
+        log.info("Number of export files to process: {}", files.size());
+        MigrationOrchestrator migrationOrchestrator = new MigrationOrchestrator();
+
+        if (files.size() == 1) {
+            migrationOrchestrator.migrate(files.get(0));
+        } else {
+            migrationOrchestrator.migrateAsync(files);
+        }
+
+        migrationOrchestrator.shutdown();
     }
 
 

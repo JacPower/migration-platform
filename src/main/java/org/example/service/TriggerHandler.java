@@ -15,4 +15,6 @@ public interface TriggerHandler {
     RedwoodJobDto migrate(Trigger trigger) throws MigrationException;
 
     String getDescription();
+
+    boolean canHandle(Trigger trigger);
 }

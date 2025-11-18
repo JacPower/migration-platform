@@ -1,0 +1,58 @@
+package org.example.handler;
+
+import lombok.extern.slf4j.Slf4j;
+import org.example.dto.internal.Trigger;
+import org.example.dto.internal.ValidationResult;
+import org.example.dto.output.RedwoodJobDto;
+import org.example.dto.output.RedwoodTriggerDto;
+import org.example.service.TriggerHandler;
+import org.example.service.TriggerType;
+
+
+@Slf4j
+public class ApiTriggerHandler implements TriggerHandler {
+
+    @Override
+    public TriggerType getSupportedType() {
+        return TriggerType.API;
+    }
+
+
+
+    @Override
+    public boolean canHandle(Trigger trigger) {
+        return trigger.getType() == TriggerType.API;
+    }
+
+
+
+    @Override
+    public ValidationResult validate(Trigger trigger) {
+        return new ValidationResult();
+    }
+
+
+
+    @Override
+    public RedwoodJobDto migrate(Trigger trigger) {
+        log.info("Migrating API trigger for job: {}", trigger.getJobName());
+
+        RedwoodTriggerDto redwoodTrigger = RedwoodTriggerDto.builder()
+                .type("API")
+                .apiEnabled(true)
+                .build();
+
+        return RedwoodJobDto.builder()
+                .name(trigger.getJobName())
+                .type("API")
+                .trigger(redwoodTrigger)
+                .build();
+    }
+
+
+
+    @Override
+    public String getDescription() {
+        return "Direct migration - RMJ supports API triggers";
+    }
+}
