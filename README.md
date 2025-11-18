@@ -71,11 +71,11 @@ Create a JSON file with your jobs:
 ```
 
 ### Trigger Types
-SCHEDULE
-MANUAL
-API
-FILE_WATCH
-DEPENDENCY
+1. SCHEDULE
+2. MANUAL
+3. API
+4. FILE_WATCH
+5. DEPENDENCY
 
 ---
 
