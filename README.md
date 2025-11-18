@@ -1,6 +1,6 @@
 # Migration Tool
 
-A Java tool to migrate jobs from a competitor's job scheduling system to the Redwood platform.
+A Java tool to migrate jobs from a competitor's job scheduling system to the migration-platform.
 
 ---
 
