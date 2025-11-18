@@ -1,4 +1,4 @@
-package org.example.domain;
+package org.example.service;
 
 /* *
  * This could be stored in a database or configuration file in a real-world application

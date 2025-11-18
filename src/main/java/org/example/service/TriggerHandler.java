@@ -1,6 +1,8 @@
-package org.example.domain;
+package org.example.service;
 
 
+import org.example.dto.internal.Trigger;
+import org.example.dto.internal.ValidationResult;
 import org.example.dto.output.RedwoodJobDto;
 import org.example.exception.MigrationException;
 

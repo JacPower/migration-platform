@@ -1,7 +1,7 @@
 package org.example.validator;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.domain.ValidationResult;
+import org.example.dto.internal.ValidationResult;
 import org.example.dto.input.CompetitorExportDto;
 import org.example.dto.input.DependencyDto;
 import org.example.dto.input.JobDto;
