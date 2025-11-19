@@ -133,7 +133,7 @@ class CompetitorDataParserTest {
         assertEquals("BACKUP", job.getJobType());
         assertEquals("ORACLE", job.getSystem());
         assertNotNull(job.getTrigger());
-        assertEquals("SCHEDULE", job.getTrigger().getType());
+        assertEquals("SCHEDULE", job.getTrigger().getType().name());
         assertEquals("0 2 * * *", job.getTrigger().getCronExpression());
         assertEquals(1, job.getDependencies().size());
         assertNotNull(job.getExecutionConstraints());
@@ -142,7 +142,6 @@ class CompetitorDataParserTest {
 
 
 
-    // Helper methods
     private Path createTempFile(String filename, String content) throws IOException {
         Path filePath = tempDir.resolve(filename);
         Files.writeString(filePath, content);

@@ -12,7 +12,6 @@ import org.example.parser.ConcurrentFileParser;
 import org.example.report.MigrationAnalysis;
 import org.example.report.MigrationResult;
 import org.example.service.TriggerMigrationService;
-import org.example.service.TriggerType;
 import org.example.validator.ConcurrentJobValidator;
 
 import java.io.IOException;
@@ -24,7 +23,6 @@ public class MigrationOrchestrator {
     private static final String MIGRATION_FAILED = "Migration failed";
     private static final String ORCHESTRATOR_SHUTDOWN = "Shutting down orchestrator...";
     private static final String SHUTDOWN_COMPLETE = "Shutdown complete";
-    private static final String UNKNOWN_TRIGGER_WARN = "Unknown trigger type '{}', using UNKNOWN";
 
     private final CompetitorDataParser competitorParser;
     private final ConcurrentFileParser fileParser;
@@ -146,17 +144,6 @@ public class MigrationOrchestrator {
                 .eventType(dto.getEventType())
                 .upstreamJobId(dto.getUpstreamJobId())
                 .build();
-    }
-
-
-
-    private TriggerType parseTriggerType(String type) {
-        try {
-            return TriggerType.valueOf(type.toUpperCase());
-        } catch (IllegalArgumentException ex) {
-            log.warn(UNKNOWN_TRIGGER_WARN, type);
-            return TriggerType.UNKNOWN;
-        }
     }
 
 
