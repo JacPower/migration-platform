@@ -9,6 +9,10 @@ import org.example.dto.output.RedwoodTriggerDto;
 import org.example.exception.MigrationException;
 import org.example.service.TriggerHandler;
 import org.example.service.TriggerType;
+import org.example.utils.Constants;
+import org.example.utils.FileUtils;
+
+import java.util.Date;
 
 @Slf4j
 public class DependencyTriggerHandler implements TriggerHandler {
@@ -59,19 +63,22 @@ public class DependencyTriggerHandler implements TriggerHandler {
                 .apiEnabled(false)
                 .build();
 
-        RedwoodJobDto job = RedwoodJobDto.builder()
+        RedwoodJobDto redwoodJobDto = RedwoodJobDto.builder()
                 .name(trigger.getJobName())
                 .type("DEPENDENCY")
                 .trigger(redwoodTrigger)
                 .build();
 
-        job.addMetadata("upstream_job_id", String.valueOf(trigger.getUpstreamJobId()));
-        job.addMetadata("trigger_type", "DEPENDENCY");
-        job.addMetadata("trigger_condition", "ON_SUCCESS");
+        redwoodJobDto.addMetadata("upstream_job_id", String.valueOf(trigger.getUpstreamJobId()));
+        redwoodJobDto.addMetadata("trigger_type", "DEPENDENCY");
+        redwoodJobDto.addMetadata("trigger_condition", "ON_SUCCESS");
+        redwoodJobDto.addNote(String.format("This job is triggered when job %d completes successfully", trigger.getUpstreamJobId()));
 
-        job.addNote(String.format("This job is triggered when job %d completes successfully", trigger.getUpstreamJobId()));
+        String outputFileName = redwoodJobDto.getName() + "_" + new Date().getTime() + ".json";
+        String outputPath = Constants.DEFAULT_OUTPUT_FOLDER;
+        FileUtils.writeToJsonFile(redwoodJobDto, outputFileName, outputPath);
 
-        return job;
+        return redwoodJobDto;
     }
 
 

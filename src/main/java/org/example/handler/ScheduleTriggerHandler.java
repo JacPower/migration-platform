@@ -8,6 +8,10 @@ import org.example.dto.output.RedwoodTriggerDto;
 import org.example.exception.MigrationException;
 import org.example.service.TriggerHandler;
 import org.example.service.TriggerType;
+import org.example.utils.Constants;
+import org.example.utils.FileUtils;
+
+import java.util.Date;
 
 
 @Slf4j
@@ -57,11 +61,17 @@ public class ScheduleTriggerHandler implements TriggerHandler {
                 .timezone(trigger.getTimezone() != null ? trigger.getTimezone() : "UTC")
                 .build();
 
-        return RedwoodJobDto.builder()
+        var redwoodJobDto = RedwoodJobDto.builder()
                 .name(trigger.getJobName())
                 .type("SCHEDULED")
                 .trigger(redwoodTrigger)
                 .build();
+
+        String outputFileName = redwoodJobDto.getName() + "_" + new Date().getTime() + ".json";
+        String outputPath = Constants.DEFAULT_OUTPUT_FOLDER;
+        FileUtils.writeToJsonFile(redwoodJobDto, outputFileName, outputPath);
+
+        return redwoodJobDto;
     }
 
 

@@ -4,9 +4,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Redwood job DTO for API calls
- */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

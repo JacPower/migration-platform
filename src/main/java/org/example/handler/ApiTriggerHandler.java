@@ -7,6 +7,10 @@ import org.example.dto.output.RedwoodJobDto;
 import org.example.dto.output.RedwoodTriggerDto;
 import org.example.service.TriggerHandler;
 import org.example.service.TriggerType;
+import org.example.utils.Constants;
+import org.example.utils.FileUtils;
+
+import java.util.Date;
 
 
 @Slf4j
@@ -42,11 +46,17 @@ public class ApiTriggerHandler implements TriggerHandler {
                 .apiEnabled(true)
                 .build();
 
-        return RedwoodJobDto.builder()
+        RedwoodJobDto redwoodJobDto = RedwoodJobDto.builder()
                 .name(trigger.getJobName())
                 .type("API")
                 .trigger(redwoodTrigger)
                 .build();
+
+        String outputFileName = redwoodJobDto.getName() + "_" + new Date().getTime() + ".json";
+        String outputPath = Constants.DEFAULT_OUTPUT_FOLDER;
+        FileUtils.writeToJsonFile(redwoodJobDto, outputFileName, outputPath);
+
+        return redwoodJobDto;
     }
 
 

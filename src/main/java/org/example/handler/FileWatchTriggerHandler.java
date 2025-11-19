@@ -8,6 +8,10 @@ import org.example.dto.output.RedwoodTriggerDto;
 import org.example.exception.MigrationException;
 import org.example.service.TriggerHandler;
 import org.example.service.TriggerType;
+import org.example.utils.Constants;
+import org.example.utils.FileUtils;
+
+import java.util.Date;
 
 @Slf4j
 public class FileWatchTriggerHandler implements TriggerHandler {
@@ -54,11 +58,15 @@ public class FileWatchTriggerHandler implements TriggerHandler {
         logConversion(trigger);
 
         RedwoodTriggerDto redwoodTrigger = buildRedwoodTrigger(trigger);
-        RedwoodJobDto job = buildRedwoodJob(trigger, redwoodTrigger);
+        var redwoodJobDto = buildRedwoodJob(trigger, redwoodTrigger);
 
-        addMigrationNotes(job, trigger);
+        addMigrationNotes(redwoodJobDto, trigger);
 
-        return job;
+        String outputFileName = redwoodJobDto.getName() + "_" + new Date().getTime() + ".json";
+        String outputPath = Constants.DEFAULT_OUTPUT_FOLDER;
+        FileUtils.writeToJsonFile(redwoodJobDto, outputFileName, outputPath);
+
+        return redwoodJobDto;
     }
 
     private void validateTrigger(Trigger trigger) throws MigrationException {
