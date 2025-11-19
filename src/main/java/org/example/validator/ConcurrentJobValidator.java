@@ -1,7 +1,7 @@
 package org.example.validator;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.dto.input.CompetitorExportDto;
+import org.example.dto.input.ExportDataDto;
 import org.example.dto.input.JobDto;
 import org.example.dto.internal.ConcurrentValidationResult;
 import org.example.dto.internal.ValidationResult;
@@ -14,29 +14,29 @@ import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
-public class ConcurrentJobValidator implements ExportValidator {
+public class ConcurrentJobValidator implements Validator {
 
     private final ExecutorService executor;
-    private final JobValidator sequentialValidator;
+    private final JobDependencyValidator jobDependencyValidator;
 
 
 
     public ConcurrentJobValidator() {
         int threads = Runtime.getRuntime().availableProcessors();
         this.executor = Executors.newFixedThreadPool(threads);
-        this.sequentialValidator = new JobValidator();
+        this.jobDependencyValidator = new JobDependencyValidator();
         log.info("Initialized concurrent validator with {} threads", threads);
     }
 
 
 
     @Override
-    public ValidationResult validate(CompetitorExportDto export) {
+    public ValidationResult validate(ExportDataDto export) {
         List<JobDto> jobs = export.getJobs();
 
         if (jobs.size() < 10) {
             log.info("Small batch ({}), using sequential validation", jobs.size());
-            return sequentialValidator.validate(export);
+            return jobDependencyValidator.validate(export);
         }
 
         log.info("Large batch ({}), using concurrent validation", jobs.size());
@@ -45,7 +45,7 @@ public class ConcurrentJobValidator implements ExportValidator {
 
 
 
-    private ValidationResult validateConcurrent(CompetitorExportDto export) {
+    private ValidationResult validateConcurrent(ExportDataDto export) {
         ConcurrentValidationResult result = new ConcurrentValidationResult();
         List<JobDto> jobs = export.getJobs();
 
@@ -56,7 +56,7 @@ public class ConcurrentJobValidator implements ExportValidator {
 
 
         ValidationResult finalResult = result.toValidationResult(); // Now validate dependencies (requires all jobs)
-        sequentialValidator.validate(export).getErrors()
+        jobDependencyValidator.validate(export).getErrors()
                 .forEach(finalResult::addError);
 
         return finalResult;

@@ -1,12 +1,12 @@
 package validation;
 
-import org.example.dto.input.CompetitorExportDto;
+import org.example.dto.input.ExportDataDto;
 import org.example.dto.input.DependencyDto;
 import org.example.dto.input.JobDto;
 import org.example.dto.input.TriggerDto;
 import org.example.dto.internal.ValidationResult;
 import org.example.service.TriggerType;
-import org.example.validator.JobValidator;
+import org.example.validator.JobDependencyValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,23 +17,23 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("JobValidator Tests")
-class JobValidatorTest {
+@DisplayName("JobDependencyValidator Tests")
+class JobDependencyValidatorTest {
 
-    private JobValidator validator;
+    private JobDependencyValidator validator;
 
 
 
     @BeforeEach
     void setUp() {
-        validator = new JobValidator();
+        validator = new JobDependencyValidator();
     }
 
 
 
     @Test
     void validate_shouldPass_whenAllJobIdsAreUnique() {
-        CompetitorExportDto export = createExport(
+        ExportDataDto export = createExport(
                 createJob(1001, "Job_1"),
                 createJob(1002, "Job_2"),
                 createJob(1003, "Job_3")
@@ -173,7 +173,7 @@ class JobValidatorTest {
 
     @Test
     void validate_shouldPass_whenExportIsEmpty() {
-        CompetitorExportDto export = CompetitorExportDto.builder().jobs(Collections.emptyList()).build();
+        ExportDataDto export = ExportDataDto.builder().jobs(Collections.emptyList()).build();
 
         ValidationResult result = validator.validate(export);
 
@@ -182,8 +182,8 @@ class JobValidatorTest {
 
 
 
-    private CompetitorExportDto createExport(JobDto... jobs) {
-        return CompetitorExportDto.builder().jobs(Arrays.asList(jobs)).build();
+    private ExportDataDto createExport(JobDto... jobs) {
+        return ExportDataDto.builder().jobs(Arrays.asList(jobs)).build();
     }
 
 

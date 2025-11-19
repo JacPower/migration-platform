@@ -2,7 +2,7 @@ package org.example.orchestrator;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.config.MigrationDependencies;
-import org.example.dto.input.CompetitorExportDto;
+import org.example.dto.input.ExportDataDto;
 import org.example.dto.input.JobDto;
 import org.example.dto.input.TriggerDto;
 import org.example.dto.internal.Trigger;
@@ -13,7 +13,7 @@ import org.example.parser.DataParser;
 import org.example.report.MigrationAnalysis;
 import org.example.report.MigrationResult;
 import org.example.service.TriggerMigrationService;
-import org.example.validator.ExportValidator;
+import org.example.validator.Validator;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,7 +27,7 @@ public class MigrationOrchestrator  implements AutoCloseable {
 
     private final DataParser dataParser;
     private final BatchFileParser batchParser;
-    private final ExportValidator validator;
+    private final Validator validator;
     private final TriggerMigrationService triggerService;
 
 
@@ -35,7 +35,7 @@ public class MigrationOrchestrator  implements AutoCloseable {
     public MigrationOrchestrator(MigrationDependencies dependencies) {
         this.dataParser = dependencies.dataParser();
         this.batchParser = dependencies.batchFileParser();
-        this.validator = dependencies.exportValidator();
+        this.validator = dependencies.validator();
         this.triggerService = dependencies.triggerService();
         log.info("Migration orchestrator initialized");
     }
@@ -53,7 +53,7 @@ public class MigrationOrchestrator  implements AutoCloseable {
             long start = System.currentTimeMillis();
             log.info("Starting migration from file: {}", filePaths.get(0));
 
-            CompetitorExportDto export = dataParser.parse(filePaths.get(0));
+            ExportDataDto export = dataParser.parse(filePaths.get(0));
             log.info("Parsed {} jobs from export file", export.getJobs().size());
 
             validateOrThrow(export);
@@ -89,7 +89,7 @@ public class MigrationOrchestrator  implements AutoCloseable {
 
 
 
-    private void validateOrThrow(CompetitorExportDto export) {
+    private void validateOrThrow(ExportDataDto export) {
         ValidationResult validation = validator.validate(export);
         log.info("Validation result:\n{}", validation);
         if (!validation.isValid()) {
@@ -103,7 +103,7 @@ public class MigrationOrchestrator  implements AutoCloseable {
 
     private List<JobDto> validateAndReturnJobs(List<JobDto> jobs) {
         log.info("Parsed {} jobs list", jobs.size());
-        CompetitorExportDto export = CompetitorExportDto.builder().jobs(jobs).build();
+        ExportDataDto export = ExportDataDto.builder().jobs(jobs).build();
         validateOrThrow(export);
         return jobs;
     }

@@ -1,8 +1,8 @@
 package parser;
 
-import org.example.dto.input.CompetitorExportDto;
+import org.example.dto.input.ExportDataDto;
 import org.example.dto.input.JobDto;
-import org.example.parser.CompetitorDataParser;
+import org.example.parser.JsonFileParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,18 +14,18 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("CompetitorDataParser Tests")
-class CompetitorDataParserTest {
+@DisplayName("JsonFileParser Tests")
+class JsonFileParserTest {
 
     @TempDir
     Path tempDir;
-    private CompetitorDataParser parser;
+    private JsonFileParser parser;
 
 
 
     @BeforeEach
     void setUp() {
-        parser = new CompetitorDataParser();
+        parser = new JsonFileParser();
     }
 
 
@@ -36,7 +36,7 @@ class CompetitorDataParserTest {
         String json = createValidJsonExport();
         Path filePath = createTempFile("valid_export.json", json);
 
-        CompetitorExportDto result = parser.parse(filePath.toString());
+        ExportDataDto result = parser.parse(filePath.toString());
 
         assertNotNull(result);
         assertEquals(2, result.getJobs().size());
@@ -73,7 +73,7 @@ class CompetitorDataParserTest {
         String json = "{\"jobs\": []}";
         Path filePath = createTempFile("empty.json", json);
 
-        CompetitorExportDto result = parser.parse(filePath.toString());
+        ExportDataDto result = parser.parse(filePath.toString());
 
         assertNotNull(result);
         assertTrue(result.getJobs().isEmpty());
@@ -98,7 +98,7 @@ class CompetitorDataParserTest {
                 """;
         Path filePath = createTempFile("unknown_props.json", json);
 
-        CompetitorExportDto result = parser.parse(filePath.toString());
+        ExportDataDto result = parser.parse(filePath.toString());
 
         assertNotNull(result);
         assertEquals(1, result.getJobs().size());
@@ -112,7 +112,7 @@ class CompetitorDataParserTest {
     void parseJsonString_shouldReturnCompetitorExportDto_whenValidStringIsPassed() throws IOException {
         String json = createValidJsonExport();
 
-        CompetitorExportDto result = parser.parse(json);
+        ExportDataDto result = parser.parse(json);
 
         assertNotNull(result);
         assertEquals(2, result.getJobs().size());
@@ -125,7 +125,7 @@ class CompetitorDataParserTest {
     void parseJsonString_shouldParseAllFieldsCorrectly_whenCompleteJobIsPassed() throws IOException {
         String json = createCompleteJobJson();
 
-        CompetitorExportDto result = parser.parse(json);
+        ExportDataDto result = parser.parse(json);
         JobDto job = result.getJobs().get(0);
 
         assertEquals(1001, job.getJobId());

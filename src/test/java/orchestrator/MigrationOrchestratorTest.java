@@ -1,7 +1,7 @@
 package orchestrator;
 
 import org.example.config.MigrationDependencies;
-import org.example.dto.input.CompetitorExportDto;
+import org.example.dto.input.ExportDataDto;
 import org.example.dto.input.JobDto;
 import org.example.dto.input.TriggerDto;
 import org.example.dto.internal.ValidationResult;
@@ -13,7 +13,7 @@ import org.example.report.MigrationAnalysis;
 import org.example.report.MigrationResult;
 import org.example.service.TriggerMigrationService;
 import org.example.service.TriggerType;
-import org.example.validator.ExportValidator;
+import org.example.validator.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +29,7 @@ class MigrationOrchestratorTest {
     private static final ValidationResult VALID = new ValidationResult();
     private DataParser mockDataParser;
     private BatchFileParser mockBatchParser;
-    private ExportValidator mockValidator;
+    private Validator mockValidator;
     private TriggerMigrationService mockTriggerService;
     private MigrationOrchestrator orchestrator;
 
@@ -39,13 +39,13 @@ class MigrationOrchestratorTest {
     void setUp() {
         mockDataParser = mock(DataParser.class);
         mockBatchParser = mock(BatchFileParser.class);
-        mockValidator = mock(ExportValidator.class);
+        mockValidator = mock(Validator.class);
         mockTriggerService = mock(TriggerMigrationService.class);
 
         MigrationDependencies deps = mock(MigrationDependencies.class);
         when(deps.dataParser()).thenReturn(mockDataParser);
         when(deps.batchFileParser()).thenReturn(mockBatchParser);
-        when(deps.exportValidator()).thenReturn(mockValidator);
+        when(deps.validator()).thenReturn(mockValidator);
         when(deps.triggerService()).thenReturn(mockTriggerService);
 
         orchestrator = new MigrationOrchestrator(deps);
@@ -72,7 +72,7 @@ class MigrationOrchestratorTest {
         String filePath = "export.json";
         JobDto job = createMockJob();
 
-        CompetitorExportDto export = CompetitorExportDto.builder().jobs(List.of(job)).build();
+        ExportDataDto export = ExportDataDto.builder().jobs(List.of(job)).build();
         MigrationResult result = mock(MigrationResult.class);
         MigrationAnalysis analysis = mock(MigrationAnalysis.class);
 
@@ -96,7 +96,7 @@ class MigrationOrchestratorTest {
     @Test
     void migrate_singleFile_shouldThrowValidationExceptionOnFailure() throws IOException {
         String filePath = "export.json";
-        CompetitorExportDto export = CompetitorExportDto.builder().jobs(List.of()).build();
+        ExportDataDto export = ExportDataDto.builder().jobs(List.of()).build();
         ValidationResult failedValidation = new ValidationResult();
         failedValidation.addError("Invalid");
 

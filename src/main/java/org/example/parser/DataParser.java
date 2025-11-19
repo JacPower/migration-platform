@@ -1,8 +1,8 @@
 package org.example.parser;
 
-import org.example.dto.input.CompetitorExportDto;
+import org.example.dto.input.ExportDataDto;
 import java.io.IOException;
 
 public interface DataParser {
-    CompetitorExportDto parse(String filePath) throws IOException;
+    ExportDataDto parse(String filePath) throws IOException;
 }

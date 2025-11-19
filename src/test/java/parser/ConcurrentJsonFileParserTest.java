@@ -1,7 +1,7 @@
 package parser;
 
 import org.example.dto.input.JobDto;
-import org.example.parser.ConcurrentFileParser;
+import org.example.parser.ConcurrentJsonFileParser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,18 +19,18 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("ConcurrentFileParser Tests")
-class ConcurrentFileParserTest {
+@DisplayName("ConcurrentJsonFileParser Tests")
+class ConcurrentJsonFileParserTest {
 
     @TempDir
     Path tempDir;
-    private ConcurrentFileParser parser;
+    private ConcurrentJsonFileParser parser;
 
 
 
     @BeforeEach
     void setUp() {
-        parser = new ConcurrentFileParser();
+        parser = new ConcurrentJsonFileParser();
     }
 
 

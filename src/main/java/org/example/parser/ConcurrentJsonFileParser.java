@@ -1,7 +1,7 @@
 package org.example.parser;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.dto.input.CompetitorExportDto;
+import org.example.dto.input.ExportDataDto;
 import org.example.dto.input.JobDto;
 
 import java.io.IOException;
@@ -14,21 +14,21 @@ import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
-public class ConcurrentFileParser implements BatchFileParser {
+public class ConcurrentJsonFileParser implements BatchFileParser {
 
     private final ExecutorService executor;
     private final DataParser parser;
 
 
 
-    public ConcurrentFileParser() {
-        this(new CompetitorDataParser());
+    public ConcurrentJsonFileParser() {
+        this(new JsonFileParser());
     }
 
 
 
-    public ConcurrentFileParser(DataParser parser) {
-        int threads = Math.min(2, Runtime.getRuntime().availableProcessors());
+    public ConcurrentJsonFileParser(DataParser parser) {
+        int threads = Math.min(4, Runtime.getRuntime().availableProcessors());
         this.executor = Executors.newFixedThreadPool(threads);
         this.parser = parser;
         log.info("Initialized concurrent parser with {} threads...", threads);
@@ -61,7 +61,7 @@ public class ConcurrentFileParser implements BatchFileParser {
         try {
             log.info("[{}] Parsing: {}", Thread.currentThread().getName(), filePath);
 
-            CompetitorExportDto export = parser.parse(filePath);
+            ExportDataDto export = parser.parse(filePath);
             return export.getJobs();
 
         } catch (IOException e) {

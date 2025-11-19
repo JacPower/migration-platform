@@ -1,6 +1,6 @@
 package validation;
 
-import org.example.dto.input.CompetitorExportDto;
+import org.example.dto.input.ExportDataDto;
 import org.example.dto.input.DependencyDto;
 import org.example.dto.input.JobDto;
 import org.example.dto.input.TriggerDto;
@@ -42,7 +42,7 @@ class ConcurrentJobValidatorTest {
     @Test
     void validate_shouldUseSequentialValidation_whenBatchIsSmall() {
         List<JobDto> jobs = createJobs(5);
-        CompetitorExportDto export = CompetitorExportDto.builder().jobs(jobs).build();
+        ExportDataDto export = ExportDataDto.builder().jobs(jobs).build();
 
         ValidationResult result = validator.validate(export);
 
@@ -54,7 +54,7 @@ class ConcurrentJobValidatorTest {
     @Test
     void validate_shouldUseConcurrentValidation_whenBatchIsLarge() {
         List<JobDto> jobs = createJobs(100);
-        CompetitorExportDto export = CompetitorExportDto.builder().jobs(jobs).build();
+        ExportDataDto export = ExportDataDto.builder().jobs(jobs).build();
 
         long startTime = System.currentTimeMillis();
         ValidationResult result = validator.validate(export);
@@ -71,7 +71,7 @@ class ConcurrentJobValidatorTest {
         List<JobDto> jobs = createJobs(50);
         jobs.add(createJobWithDeps(9999, "Invalid_Job", 88888));
 
-        CompetitorExportDto export = CompetitorExportDto.builder().jobs(jobs).build();
+        ExportDataDto export = ExportDataDto.builder().jobs(jobs).build();
 
         ValidationResult result = validator.validate(export);
 
@@ -83,7 +83,7 @@ class ConcurrentJobValidatorTest {
     @Test
     void validate_shouldBeThreadSafe_whenMultipleThreadsRunConcurrently() throws InterruptedException {
         List<JobDto> jobs = createJobs(100);
-        CompetitorExportDto export = CompetitorExportDto.builder().jobs(jobs).build();
+        ExportDataDto export = ExportDataDto.builder().jobs(jobs).build();
 
         List<ValidationResult> results = new ArrayList<>();
         List<Thread> threads = new ArrayList<>();

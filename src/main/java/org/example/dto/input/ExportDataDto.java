@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CompetitorExportDto {
+public class ExportDataDto {
 
     @Valid
     @NotNull(message = "Jobs list cannot be null")

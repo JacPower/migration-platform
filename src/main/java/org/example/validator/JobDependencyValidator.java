@@ -2,7 +2,7 @@ package org.example.validator;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.dto.internal.ValidationResult;
-import org.example.dto.input.CompetitorExportDto;
+import org.example.dto.input.ExportDataDto;
 import org.example.dto.input.DependencyDto;
 import org.example.dto.input.JobDto;
 
@@ -10,9 +10,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class JobValidator {
+public class JobDependencyValidator {
 
-    public ValidationResult validate(CompetitorExportDto export) {
+    public ValidationResult validate(ExportDataDto export) {
         List<JobDto> jobs = export.getJobs();
         ValidationResult result = new ValidationResult();
 
