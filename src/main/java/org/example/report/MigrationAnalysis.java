@@ -76,8 +76,6 @@ public class MigrationAnalysis {
     }
 
 
-    // --------------------- Section Loggers ---------------------
-
 
 
     private void logSupported() {
@@ -105,7 +103,7 @@ public class MigrationAnalysis {
 
 
     private void logUnsupported() {
-        log.error("\n❌ UNSUPPORTED TRIGGERS:");
+        log.error("\nUNSUPPORTED TRIGGERS:");
         unsupported.forEach(ut -> {
             log.error("  - {}", ut.getTrigger().getJobName());
             log.error("    Type: {}", ut.getTrigger().getType());
@@ -116,7 +114,7 @@ public class MigrationAnalysis {
 
 
     private void logInvalid() {
-        log.error("\n❌ INVALID TRIGGERS:");
+        log.error("\nINVALID TRIGGERS:");
         invalid.forEach(it -> {
             log.error("  - {}", it.getTrigger().getJobName());
             log.error("    Type: {}", it.getTrigger().getType());

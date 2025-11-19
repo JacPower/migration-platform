@@ -1,10 +1,10 @@
 package org.example.validator;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.dto.internal.ConcurrentValidationResult;
-import org.example.dto.internal.ValidationResult;
 import org.example.dto.input.CompetitorExportDto;
 import org.example.dto.input.JobDto;
+import org.example.dto.internal.ConcurrentValidationResult;
+import org.example.dto.internal.ValidationResult;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
-public class ConcurrentJobValidator {
+public class ConcurrentJobValidator implements ExportValidator {
 
     private final ExecutorService executor;
     private final JobValidator sequentialValidator;
@@ -30,6 +30,7 @@ public class ConcurrentJobValidator {
 
 
 
+    @Override
     public ValidationResult validate(CompetitorExportDto export) {
         List<JobDto> jobs = export.getJobs();
 
@@ -75,6 +76,7 @@ public class ConcurrentJobValidator {
 
 
 
+    @Override
     public void shutdown() {
         executor.shutdown();
         try {

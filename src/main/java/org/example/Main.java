@@ -18,33 +18,29 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         List<String> files = loadExportFiles();
-
         if (files.isEmpty()) {
-            log.error("No export files found in the input folder: {}", INPUT_FOLDER.toAbsolutePath());
+            log.info("No export files found for migration: {}", INPUT_FOLDER.toAbsolutePath());
             return;
         }
 
         log.info("Number of export files to process: {}", files.size());
         MigrationOrchestrator migrationOrchestrator = new MigrationOrchestrator();
-
-        if (files.size() == 1) {
-            migrationOrchestrator.migrate(files.get(0));
-        } else {
-            migrationOrchestrator.migrateAsync(files);
-        }
-
-        migrationOrchestrator.shutdown();
+        migrationOrchestrator.migrate(files);
+        migrationOrchestrator.close();
     }
 
 
 
-    private static List<String> loadExportFiles() throws IOException {
+    private static List<String> loadExportFiles() {
         try (Stream<Path> stream = Files.list(Main.INPUT_FOLDER)) {
             return stream
                     .filter(Files::isRegularFile)
                     .map(Path::toString)
                     .filter(string -> string.toLowerCase().endsWith(".json"))
                     .toList();
+        } catch (IOException e) {
+          log.error("Failed to load export files: ", e);
+          return List.of();
         }
     }
 }

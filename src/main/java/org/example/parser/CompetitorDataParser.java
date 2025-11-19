@@ -9,7 +9,7 @@ import java.io.IOException;
 
 
 @Slf4j
-public class CompetitorDataParser {
+public class CompetitorDataParser implements DataParser {
 
     private final ObjectMapper objectMapper;
 
@@ -21,7 +21,8 @@ public class CompetitorDataParser {
 
 
 
-    public CompetitorExportDto parseJson(String filePath) throws IOException {
+    @Override
+    public CompetitorExportDto parse(String filePath) throws IOException {
         log.info("Parsing JSON file: {}", filePath);
 
         File file = new File(filePath);
@@ -33,12 +34,6 @@ public class CompetitorDataParser {
         log.info("Parsed {} jobs from {}", export.getJobs().size(), filePath);
 
         return export;
-    }
-
-
-
-    public CompetitorExportDto parseJsonString(String json) throws IOException {
-        return objectMapper.readValue(json, CompetitorExportDto.class);
     }
 }
 

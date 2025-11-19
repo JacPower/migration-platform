@@ -11,26 +11,32 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 
 @Slf4j
-public class ConcurrentFileParser {
+public class ConcurrentFileParser implements BatchFileParser {
 
     private final ExecutorService executor;
-    private final CompetitorDataParser parser;
+    private final DataParser parser;
 
 
 
     public ConcurrentFileParser() {
+        this(new CompetitorDataParser());
+    }
+
+
+
+    public ConcurrentFileParser(DataParser parser) {
         int threads = Math.min(2, Runtime.getRuntime().availableProcessors());
         this.executor = Executors.newFixedThreadPool(threads);
-        this.parser = new CompetitorDataParser();
+        this.parser = parser;
         log.info("Initialized concurrent parser with {} threads...", threads);
     }
 
 
 
+    @Override
     public CompletableFuture<List<JobDto>> parseMultipleFiles(List<String> filePaths) {
         log.info("Parsing {} files concurrently", filePaths.size());
 
@@ -39,13 +45,13 @@ public class ConcurrentFileParser {
                         () -> parseFile(path),
                         executor
                 ))
-                .collect(Collectors.toList());
+                .toList();
 
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
                 .thenApply(v -> futures.stream()
                         .map(CompletableFuture::join)
                         .flatMap(List::stream)
-                        .collect(Collectors.toList())
+                        .toList()
                 );
     }
 
@@ -55,7 +61,7 @@ public class ConcurrentFileParser {
         try {
             log.info("[{}] Parsing: {}", Thread.currentThread().getName(), filePath);
 
-            CompetitorExportDto export = parser.parseJson(filePath);
+            CompetitorExportDto export = parser.parse(filePath);
             return export.getJobs();
 
         } catch (IOException e) {

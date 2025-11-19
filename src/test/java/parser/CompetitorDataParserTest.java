@@ -32,11 +32,11 @@ class CompetitorDataParserTest {
 
     @Test
     @DisplayName("parseJson_shouldReturnCompetitorExportDto_whenValidJsonFileIsPassed")
-    void parseJson_shouldReturnCompetitorExportDto_whenValidJsonFileIsPassed() throws IOException {
+    void parseJson_shouldReturnCompetitorExportDto_whenValidFileIsPassed() throws IOException {
         String json = createValidJsonExport();
         Path filePath = createTempFile("valid_export.json", json);
 
-        CompetitorExportDto result = parser.parseJson(filePath.toString());
+        CompetitorExportDto result = parser.parse(filePath.toString());
 
         assertNotNull(result);
         assertEquals(2, result.getJobs().size());
@@ -48,32 +48,32 @@ class CompetitorDataParserTest {
 
     @Test
     @DisplayName("parseJson_shouldThrowIOException_whenFileDoesNotExist")
-    void parseJson_shouldThrowIOException_whenFileDoesNotExist() {
+    void parse_shouldThrowIOException_whenFileDoesNotExist() {
         String nonExistentPath = "/non/existent/path.json";
 
-        assertThrows(IOException.class, () -> parser.parseJson(nonExistentPath));
+        assertThrows(IOException.class, () -> parser.parse(nonExistentPath));
     }
 
 
 
     @Test
     @DisplayName("parseJson_shouldThrowException_whenInvalidJsonIsPassed")
-    void parseJson_shouldThrowException_whenInvalidJsonIsPassed() throws IOException {
+    void parseJson_shouldThrowException_whenInvalidIsPassed() throws IOException {
         String invalidJson = "{ invalid json }";
         Path filePath = createTempFile("invalid.json", invalidJson);
 
-        assertThrows(Exception.class, () -> parser.parseJson(filePath.toString()));
+        assertThrows(Exception.class, () -> parser.parse(filePath.toString()));
     }
 
 
 
     @Test
     @DisplayName("parseJson_shouldReturnEmptyJobs_whenJsonContainsEmptyJobsArray")
-    void parseJson_shouldReturnEmptyJobs_whenJsonContainsEmptyJobsArray() throws IOException {
+    void parseJson_shouldReturnEmptyJobs_whenContainsEmptyJobsArray() throws IOException {
         String json = "{\"jobs\": []}";
         Path filePath = createTempFile("empty.json", json);
 
-        CompetitorExportDto result = parser.parseJson(filePath.toString());
+        CompetitorExportDto result = parser.parse(filePath.toString());
 
         assertNotNull(result);
         assertTrue(result.getJobs().isEmpty());
@@ -83,7 +83,7 @@ class CompetitorDataParserTest {
 
     @Test
     @DisplayName("parseJson_shouldIgnoreUnknownProperties_whenJsonContainsUnknownFields")
-    void parseJson_shouldIgnoreUnknownProperties_whenJsonContainsUnknownFields() throws IOException {
+    void parseJson_shouldIgnoreUnknownProperties_whenContainsUnknownFields() throws IOException {
         String json = """
                 {
                     "jobs": [
@@ -98,7 +98,7 @@ class CompetitorDataParserTest {
                 """;
         Path filePath = createTempFile("unknown_props.json", json);
 
-        CompetitorExportDto result = parser.parseJson(filePath.toString());
+        CompetitorExportDto result = parser.parse(filePath.toString());
 
         assertNotNull(result);
         assertEquals(1, result.getJobs().size());
@@ -109,10 +109,10 @@ class CompetitorDataParserTest {
     // JSON string parsing tests
     @Test
     @DisplayName("parseJsonString_shouldReturnCompetitorExportDto_whenValidJsonStringIsPassed")
-    void parseJsonString_shouldReturnCompetitorExportDto_whenValidJsonStringIsPassed() throws IOException {
+    void parseJsonString_shouldReturnCompetitorExportDto_whenValidStringIsPassed() throws IOException {
         String json = createValidJsonExport();
 
-        CompetitorExportDto result = parser.parseJsonString(json);
+        CompetitorExportDto result = parser.parse(json);
 
         assertNotNull(result);
         assertEquals(2, result.getJobs().size());
@@ -122,10 +122,10 @@ class CompetitorDataParserTest {
 
     @Test
     @DisplayName("parseJsonString_shouldParseAllFieldsCorrectly_whenCompleteJobJsonIsPassed")
-    void parseJsonString_shouldParseAllFieldsCorrectly_whenCompleteJobJsonIsPassed() throws IOException {
+    void parseJsonString_shouldParseAllFieldsCorrectly_whenCompleteJobIsPassed() throws IOException {
         String json = createCompleteJobJson();
 
-        CompetitorExportDto result = parser.parseJsonString(json);
+        CompetitorExportDto result = parser.parse(json);
         JobDto job = result.getJobs().get(0);
 
         assertEquals(1001, job.getJobId());

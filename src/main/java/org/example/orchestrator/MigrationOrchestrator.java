@@ -1,72 +1,83 @@
 package org.example.orchestrator;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.config.MigrationDependencies;
 import org.example.dto.input.CompetitorExportDto;
 import org.example.dto.input.JobDto;
 import org.example.dto.input.TriggerDto;
 import org.example.dto.internal.Trigger;
 import org.example.dto.internal.ValidationResult;
 import org.example.exception.ValidationException;
-import org.example.parser.CompetitorDataParser;
-import org.example.parser.ConcurrentFileParser;
+import org.example.parser.BatchFileParser;
+import org.example.parser.DataParser;
 import org.example.report.MigrationAnalysis;
 import org.example.report.MigrationResult;
 import org.example.service.TriggerMigrationService;
-import org.example.validator.ConcurrentJobValidator;
+import org.example.validator.ExportValidator;
 
 import java.io.IOException;
 import java.util.List;
 
 @Slf4j
-public class MigrationOrchestrator {
+public class MigrationOrchestrator  implements AutoCloseable {
 
     private static final String MIGRATION_FAILED = "Migration failed";
     private static final String ORCHESTRATOR_SHUTDOWN = "Shutting down orchestrator...";
     private static final String SHUTDOWN_COMPLETE = "Shutdown complete";
 
-    private final CompetitorDataParser competitorParser;
-    private final ConcurrentFileParser fileParser;
-    private final ConcurrentJobValidator jobValidator;
+    private final DataParser dataParser;
+    private final BatchFileParser batchParser;
+    private final ExportValidator validator;
     private final TriggerMigrationService triggerService;
 
 
 
-    public MigrationOrchestrator() {
-        this.competitorParser = new CompetitorDataParser();
-        this.fileParser = new ConcurrentFileParser();
-        this.jobValidator = new ConcurrentJobValidator();
-        this.triggerService = new TriggerMigrationService();
+    public MigrationOrchestrator(MigrationDependencies dependencies) {
+        this.dataParser = dependencies.dataParser();
+        this.batchParser = dependencies.batchFileParser();
+        this.validator = dependencies.exportValidator();
+        this.triggerService = dependencies.triggerService();
         log.info("Migration orchestrator initialized");
     }
 
 
 
-    public void migrate(String filePath) throws IOException {
-        long start = System.currentTimeMillis();
-        log.info("Starting migration from file: {}", filePath);
-
-        CompetitorExportDto export = competitorParser.parseJson(filePath);
-        log.info("Parsed {} jobs from export file", export.getJobs().size());
-
-        validateOrThrow(export);
-
-        List<Trigger> triggers = convertToTriggers(export.getJobs());
-
-        analyzeTriggers(triggers);
-
-        log.info("Migrating triggers to Redwood...");
-        MigrationResult result = triggerService.migrateAll(triggers);
-
-        logCompletion(result, start);
+    public MigrationOrchestrator() {
+        this(MigrationDependencies.createDefault());
     }
 
 
 
-    public void migrateAsync(List<String> paths) {
+    public void migrate(List<String> filePaths) throws IOException {
+        if(filePaths.size() ==1) {
+            long start = System.currentTimeMillis();
+            log.info("Starting migration from file: {}", filePaths.get(0));
+
+            CompetitorExportDto export = dataParser.parse(filePaths.get(0));
+            log.info("Parsed {} jobs from export file", export.getJobs().size());
+
+            validateOrThrow(export);
+
+            List<Trigger> triggers = convertToTriggers(export.getJobs());
+
+            analyzeTriggers(triggers);
+
+            log.info("Migrating triggers to Redwood...");
+            MigrationResult result = triggerService.migrateAll(triggers);
+
+            logCompletion(result, start);
+        } else {
+            migrateAsync(filePaths);
+        }
+    }
+
+
+
+    private void migrateAsync(List<String> paths) {
         long start = System.currentTimeMillis();
         log.info("Starting concurrent migration for {} files", paths.size());
 
-        fileParser.parseMultipleFiles(paths)
+        batchParser.parseMultipleFiles(paths)
                 .thenApply(this::validateAndReturnJobs)
                 .thenApply(this::analyzeAndMigrate)
                 .thenApply(result -> logCompletion(result, start))
@@ -79,7 +90,7 @@ public class MigrationOrchestrator {
 
 
     private void validateOrThrow(CompetitorExportDto export) {
-        ValidationResult validation = jobValidator.validate(export);
+        ValidationResult validation = validator.validate(export);
         log.info("Validation result:\n{}", validation);
         if (!validation.isValid()) {
             log.error("Validation failed. Migration aborted.");
@@ -148,10 +159,11 @@ public class MigrationOrchestrator {
 
 
 
-    public void shutdown() {
+    @Override
+    public void close() {
         log.info(ORCHESTRATOR_SHUTDOWN);
-        fileParser.shutdown();
-        jobValidator.shutdown();
+        batchParser.shutdown();
+        validator.shutdown();
         log.info(SHUTDOWN_COMPLETE);
     }
 }
