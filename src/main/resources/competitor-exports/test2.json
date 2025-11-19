@@ -1,0 +1,327 @@
+{
+  "jobs": [
+    {
+      "jobId": 10001,
+      "jobName": "Sync_Customer_Master_Data",
+      "jobType": "SYNC",
+      "system": "SALESFORCE",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 0 * * *",
+        "timezone": "America/Los_Angeles"
+      },
+      "dependencies": [],
+      "executionConstraints": {
+        "priority": 7,
+        "maxRuntimeMinutes": 90,
+        "excludeHolidays": false
+      },
+      "notes": "Nightly sync of customer master data from Salesforce CRM"
+    },
+    {
+      "jobId": 10002,
+      "jobName": "ETL_Product_Catalog",
+      "jobType": "TRANSFORM",
+      "system": "POSTGRES",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "30 1 * * *",
+        "timezone": "America/Los_Angeles"
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 10001,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 6,
+        "maxRuntimeMinutes": 45,
+        "excludeHolidays": false
+      },
+      "notes": "Extract and transform product catalog for analytics"
+    },
+    {
+      "jobId": 10003,
+      "jobName": "Calculate_Pricing_Tiers",
+      "jobType": "COMPUTE",
+      "system": "POSTGRES",
+      "trigger": {
+        "type": "DEPENDENCY",
+        "upstreamJobId": 10002
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 10002,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 8,
+        "maxRuntimeMinutes": 30,
+        "excludeHolidays": false
+      },
+      "notes": "Calculates dynamic pricing tiers based on inventory and demand"
+    },
+    {
+      "jobId": 10004,
+      "jobName": "Ingest_Clickstream_Data",
+      "jobType": "INGEST",
+      "system": "KAFKA",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "*/15 * * * *",
+        "timezone": "UTC"
+      },
+      "dependencies": [],
+      "executionConstraints": {
+        "priority": 9,
+        "maxRuntimeMinutes": 10,
+        "excludeHolidays": false
+      },
+      "notes": "Ingests clickstream data from Kafka every 15 minutes"
+    },
+    {
+      "jobId": 10005,
+      "jobName": "Build_User_Segments",
+      "jobType": "ANALYTICS",
+      "system": "SNOWFLAKE",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 4 * * *",
+        "timezone": "UTC"
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 10004,
+          "requiredStatus": "SUCCESS"
+        },
+        {
+          "dependsOnJobId": 10001,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 7,
+        "maxRuntimeMinutes": 120,
+        "excludeHolidays": false
+      },
+      "notes": "Builds customer segments for marketing campaigns"
+    },
+    {
+      "jobId": 10006,
+      "jobName": "Generate_Recommendation_Model",
+      "jobType": "ML",
+      "system": "DATABRICKS",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 6 * * 1",
+        "timezone": "UTC"
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 10005,
+          "requiredStatus": "SUCCESS"
+        },
+        {
+          "dependsOnJobId": 10003,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 6,
+        "maxRuntimeMinutes": 240,
+        "excludeHolidays": true
+      },
+      "notes": "Weekly ML model training for product recommendations"
+    },
+    {
+      "jobId": 10007,
+      "jobName": "Process_Payment_Transactions",
+      "jobType": "PROCESS",
+      "system": "STRIPE",
+      "trigger": {
+        "type": "FILE_WATCH",
+        "watchPath": "/data/payments/incoming",
+        "filePattern": "txn_*.json"
+      },
+      "dependencies": [],
+      "executionConstraints": {
+        "priority": 10,
+        "maxRuntimeMinutes": 5,
+        "excludeHolidays": false
+      },
+      "notes": "Processes payment transaction files from Stripe - high priority"
+    },
+    {
+      "jobId": 10008,
+      "jobName": "Reconcile_Daily_Revenue",
+      "jobType": "RECONCILE",
+      "system": "NETSUITE",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 7 * * *",
+        "timezone": "America/New_York"
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 10007,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 10,
+        "maxRuntimeMinutes": 45,
+        "excludeHolidays": true
+      },
+      "notes": "Critical - reconciles daily revenue with payment processor"
+    },
+    {
+      "jobId": 10009,
+      "jobName": "Generate_Executive_Dashboard",
+      "jobType": "REPORT",
+      "system": "TABLEAU",
+      "trigger": {
+        "type": "DEPENDENCY",
+        "upstreamJobId": 10008
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 10008,
+          "requiredStatus": "SUCCESS"
+        },
+        {
+          "dependsOnJobId": 10005,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 9,
+        "maxRuntimeMinutes": 20,
+        "excludeHolidays": true
+      },
+      "notes": "Executive dashboard refresh for morning standup"
+    },
+    {
+      "jobId": 10010,
+      "jobName": "Webhook_Inventory_Update",
+      "jobType": "INTEGRATION",
+      "system": "SHOPIFY",
+      "trigger": {
+        "type": "API",
+        "eventSource": "shopify_webhook",
+        "eventType": "inventory_level_update"
+      },
+      "dependencies": [],
+      "executionConstraints": {
+        "priority": 8,
+        "maxRuntimeMinutes": 5,
+        "excludeHolidays": false
+      },
+      "notes": "Real-time inventory updates from Shopify stores"
+    },
+    {
+      "jobId": 10011,
+      "jobName": "Manual_Inventory_Adjustment",
+      "jobType": "MAINTENANCE",
+      "system": "WAREHOUSE",
+      "trigger": {
+        "type": "MANUAL"
+      },
+      "dependencies": [],
+      "executionConstraints": {
+        "priority": 4,
+        "maxRuntimeMinutes": 30,
+        "excludeHolidays": false
+      },
+      "notes": "Manual job for warehouse inventory adjustments"
+    },
+    {
+      "jobId": 10012,
+      "jobName": "Archive_Historical_Orders",
+      "jobType": "ARCHIVE",
+      "system": "S3",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 2 * * 0",
+        "timezone": "UTC"
+      },
+      "dependencies": [],
+      "executionConstraints": {
+        "priority": 3,
+        "maxRuntimeMinutes": 300,
+        "excludeHolidays": false
+      },
+      "notes": "Weekly archival of orders older than 2 years to cold storage"
+    },
+    {
+      "jobId": 10013,
+      "jobName": "Database_Vacuum_Analyze",
+      "jobType": "MAINTENANCE",
+      "system": "POSTGRES",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 3 * * 6",
+        "timezone": "UTC"
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 10012,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 5,
+        "maxRuntimeMinutes": 180,
+        "excludeHolidays": false
+      },
+      "notes": "Weekly vacuum and analyze on Postgres databases"
+    },
+    {
+      "jobId": 10014,
+      "jobName": "Send_Marketing_Emails",
+      "jobType": "NOTIFICATION",
+      "system": "SENDGRID",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 9 * * 1-5",
+        "timezone": "America/New_York"
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 10005,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 6,
+        "maxRuntimeMinutes": 60,
+        "excludeHolidays": true
+      },
+      "notes": "Sends segmented marketing emails on weekday mornings"
+    },
+    {
+      "jobId": 10015,
+      "jobName": "Quarterly_Tax_Report",
+      "jobType": "REPORT",
+      "system": "NETSUITE",
+      "trigger": {
+        "type": "SCHEDULE",
+        "cronExpression": "0 8 1 1,4,7,10 *",
+        "timezone": "America/New_York"
+      },
+      "dependencies": [
+        {
+          "dependsOnJobId": 10008,
+          "requiredStatus": "SUCCESS"
+        }
+      ],
+      "executionConstraints": {
+        "priority": 10,
+        "maxRuntimeMinutes": 90,
+        "excludeHolidays": false
+      },
+      "notes": "Quarterly tax report for finance team - runs on first of each quarter"
+    }
+  ]
+}

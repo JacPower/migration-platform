@@ -46,7 +46,7 @@ class ConcurrentJsonFileParserTest {
     @DisplayName("parseMultipleFiles_shouldReturnAllJobs_whenAllFilesAreValid")
     void parseMultipleFiles_shouldReturnAllJobs_whenAllFilesAreValid() throws Exception {
         Path file1 = createTestFile("file1.json", 1001, "Job_1");
-        Path file2 = createTestFile("file2.json", 1002, "Job_2");
+        Path file2 = createTestFile("test2.json", 1002, "Job_2");
         Path file3 = createTestFile("file3.json", 1003, "Job_3");
 
         List<String> filePaths = List.of(file1.toString(), file2.toString(), file3.toString());

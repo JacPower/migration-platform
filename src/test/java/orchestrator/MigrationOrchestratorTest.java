@@ -111,7 +111,7 @@ class MigrationOrchestratorTest {
 
     @Test
     void migrate_multipleFiles_shouldCallBatchParser() throws IOException {
-        List<String> paths = List.of("file1.json", "file2.json");
+        List<String> paths = List.of("file1.json", "test2.json");
         List<JobDto> jobs = List.of(createMockJob());
         when(mockBatchParser.parseMultipleFiles(paths)).thenReturn(CompletableFuture.completedFuture(jobs));
         when(mockValidator.validate(any())).thenReturn(VALID);
