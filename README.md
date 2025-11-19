@@ -1,6 +1,6 @@
 # Migration Platform
 
-A high-performance Java tool for migrating job scheduling data from competitor systems to Redwood's RunMyJobs format.
+A high-performance Java tool for migrating job scheduling data from competitor systems to RunMyJobs format.
 
 [![Java](https://img.shields.io/badge/Java-11%2B-orange)](https://www.oracle.com/java/)
 [![Maven](https://img.shields.io/badge/Maven-3.6%2B-blue)](https://maven.apache.org/)
@@ -95,7 +95,7 @@ java [JVM_OPTIONS] -jar migration-platform-1.0.jar <file1.json> [file2.json] ...
 ### Processing Pipeline
 
 ```
-Input (JSON) → Parse → Validate → Analyze → Transform → Output (Redwood)
+Input (JSON) → Parse → Validate → Analyze → Transform → Output (RunMyJobs)
 ```
 
 1. **Parse** - Reads competitor export files and extracts job definitions
