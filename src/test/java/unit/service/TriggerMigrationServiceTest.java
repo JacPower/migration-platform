@@ -1,4 +1,4 @@
-package service;
+package unit.service;
 
 import org.example.dto.internal.Trigger;
 import org.example.dto.internal.ValidationResult;

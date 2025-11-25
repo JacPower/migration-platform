@@ -75,7 +75,7 @@ public class DependencyTriggerHandler implements TriggerHandler {
         redwoodJobDto.addNote(String.format("This job is triggered when job %d completes successfully", trigger.getUpstreamJobId()));
 
         String outputFileName = redwoodJobDto.getName() + "_" + new Date().getTime() + ".json";
-        String outputPath = Constants.DEFAULT_OUTPUT_FOLDER;
+        String outputPath = trigger.getOutputFolderPath();
         FileUtils.writeToJsonFile(redwoodJobDto, outputFileName, outputPath);
 
         return redwoodJobDto;

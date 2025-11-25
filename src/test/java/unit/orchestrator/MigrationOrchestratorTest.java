@@ -1,4 +1,4 @@
-package orchestrator;
+package unit.orchestrator;
 
 import org.example.config.MigrationDependencies;
 import org.example.dto.input.ExportDataDto;
@@ -48,7 +48,7 @@ class MigrationOrchestratorTest {
         when(deps.validator()).thenReturn(mockValidator);
         when(deps.triggerService()).thenReturn(mockTriggerService);
 
-        orchestrator = new MigrationOrchestrator(deps);
+        orchestrator = new MigrationOrchestrator(deps, "export.json");
     }
 
 

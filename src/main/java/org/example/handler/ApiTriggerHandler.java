@@ -53,7 +53,7 @@ public class ApiTriggerHandler implements TriggerHandler {
                 .build();
 
         String outputFileName = redwoodJobDto.getName() + "_" + new Date().getTime() + ".json";
-        String outputPath = Constants.DEFAULT_OUTPUT_FOLDER;
+        String outputPath = trigger.getOutputFolderPath();
         FileUtils.writeToJsonFile(redwoodJobDto, outputFileName, outputPath);
 
         return redwoodJobDto;

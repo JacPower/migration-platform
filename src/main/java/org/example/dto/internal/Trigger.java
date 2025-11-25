@@ -26,4 +26,6 @@ public class Trigger {
     private String eventType;
 
     private Integer upstreamJobId;
+
+    private String outputFolderPath;
 }

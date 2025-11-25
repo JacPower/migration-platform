@@ -1,4 +1,4 @@
-package parser;
+package unit.parser;
 
 import org.example.dto.input.ExportDataDto;
 import org.example.dto.input.JobDto;

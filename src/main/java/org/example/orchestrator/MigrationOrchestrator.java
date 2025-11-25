@@ -29,21 +29,23 @@ public class MigrationOrchestrator  implements AutoCloseable {
     private final BatchFileParser batchParser;
     private final Validator validator;
     private final TriggerMigrationService triggerService;
+    private final String outputPath;
 
 
 
-    public MigrationOrchestrator(MigrationDependencies dependencies) {
+    public MigrationOrchestrator(MigrationDependencies dependencies, String outputPath) {
         this.dataParser = dependencies.dataParser();
         this.batchParser = dependencies.batchFileParser();
         this.validator = dependencies.validator();
         this.triggerService = dependencies.triggerService();
+        this.outputPath = outputPath;
         log.info("Migration orchestrator initialized");
     }
 
 
 
-    public MigrationOrchestrator() {
-        this(MigrationDependencies.createDefault());
+    public MigrationOrchestrator(String outputPath) {
+        this(MigrationDependencies.createDefault(), outputPath);
     }
 
 
@@ -154,6 +156,7 @@ public class MigrationOrchestrator  implements AutoCloseable {
                 .eventSource(dto.getEventSource())
                 .eventType(dto.getEventType())
                 .upstreamJobId(dto.getUpstreamJobId())
+                .outputFolderPath(outputPath)
                 .build();
     }
 

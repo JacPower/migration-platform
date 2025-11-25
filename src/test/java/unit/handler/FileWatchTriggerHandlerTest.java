@@ -1,4 +1,4 @@
-package handler;
+package unit.handler;
 
 import org.example.dto.internal.Trigger;
 import org.example.dto.internal.ValidationResult;

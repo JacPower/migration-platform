@@ -6,14 +6,9 @@ import org.example.exception.MigrationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.List;
 import java.util.stream.Stream;
-
-import static org.example.utils.JsonUtils.toJsonString;
 
 @Slf4j
 public final class FileUtils {
@@ -93,7 +88,7 @@ public final class FileUtils {
 
 
 
-    public static void writeToJsonFile(Object dto, String outputFileName, String outputFolder) throws MigrationException{
+    public static void writeToJsonFile(Object dto, String outputFileName, String outputFolder) throws MigrationException {
         String jsonString = JsonUtils.toJsonString(dto);
         if (jsonString == null || jsonString.isBlank()) {
             throw new MigrationException("Failed to convert redwoodJobDto to json string");
@@ -103,5 +98,20 @@ public final class FileUtils {
         String outputPath = outputFolder.endsWith("/") ? outputFolder + fileName : outputFolder + "/" + fileName;
 
         FileUtils.appendToFile(outputPath, jsonString);
+    }
+
+
+
+    public static boolean isValidDirectoryPathFormat(String path) {
+        if (path == null || path.isBlank()) {
+            return false;
+        }
+
+        try {
+            Paths.get(path.trim());
+            return true;
+        } catch (InvalidPathException e) {
+            return false;
+        }
     }
 }
