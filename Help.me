@@ -1,27 +1,42 @@
 Cycle Detection – Simple Explanation
 
-Some older workflows have steps that accidentally point back to each other in a loop.
-Example:
-Step A waits for Step B → Step B waits for Step C → Step C waits for Step A again.
-This creates an endless loop, and the system gets stuck.
+Some older workflows contain mistakes where steps end up depending on each other in a round-and-round loop. When this happens, the system gets stuck and can’t move forward.
 
-To detect this, we used a very lightweight method similar to two people walking around a track:
+To prevent this, we added a smart check that detects these loops before they cause problems.
 
-One person walks at normal speed
+Real-World Example
 
-The other walks faster
+Imagine three coworkers:
 
-If the faster person eventually catches up, it means they are walking in a circle
+Alice needs Bob’s key
 
-We apply the same idea to workflow steps.
-If our “fast walker” catches the “slow walker,” we know there is a loop in the workflow, and we stop the import with a clear error message.
+Bob needs Carol’s key
 
-Why it’s good
+Carol needs Alice’s key
 
-Quick – It checks the entire workflow very fast.
+Everyone is waiting for someone else, and no one can open the door.
+That’s what a circular dependency looks like in a workflow  everything is blocked.
 
-Safe – It doesn’t use extra memory or heavy processing.
+Our validator now catches this situation early and stops the workflow from being loaded.
 
-Clear errors – Instead of crashing, we now tell the user exactly what went wrong.
+How the tool detects it (in simple terms)
 
-This ensures that bad or corrupted workflows never reach the database and prevents future system crashes.
+We use a method similar to two people walking around a track:
+
+One walks slowly
+
+One walks faster
+
+If the fast person eventually catches the slow person, they must be walking in a circle
+
+This helps us identify loops quickly and safely.
+
+Why this is important
+
+It prevents system crashes
+
+It keeps bad or broken workflows out of the database
+
+It gives clear error messages, so it’s easier to fix the data
+
+This makes the entire migration process more reliable and much easier to maintain.
