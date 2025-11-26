@@ -1,0 +1,27 @@
+Cycle Detection – Simple Explanation
+
+Some older workflows have steps that accidentally point back to each other in a loop.
+Example:
+Step A waits for Step B → Step B waits for Step C → Step C waits for Step A again.
+This creates an endless loop, and the system gets stuck.
+
+To detect this, we used a very lightweight method similar to two people walking around a track:
+
+One person walks at normal speed
+
+The other walks faster
+
+If the faster person eventually catches up, it means they are walking in a circle
+
+We apply the same idea to workflow steps.
+If our “fast walker” catches the “slow walker,” we know there is a loop in the workflow, and we stop the import with a clear error message.
+
+Why it’s good
+
+Quick – It checks the entire workflow very fast.
+
+Safe – It doesn’t use extra memory or heavy processing.
+
+Clear errors – Instead of crashing, we now tell the user exactly what went wrong.
+
+This ensures that bad or corrupted workflows never reach the database and prevents future system crashes.
