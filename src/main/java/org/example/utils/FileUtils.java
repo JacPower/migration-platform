@@ -5,10 +5,14 @@ import org.example.exception.MigrationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Slf4j
 public final class FileUtils {
@@ -112,6 +116,51 @@ public final class FileUtils {
             return true;
         } catch (InvalidPathException e) {
             return false;
+        }
+    }
+
+
+
+    public static void zipFolderAndDelete(Path sourceFolder, Path zipFile) throws IOException {
+
+        Files.createDirectories(zipFile.getParent());
+
+        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(zipFile))) {
+
+            try (var paths = Files.walk(sourceFolder)) {
+                paths.forEach(path -> {
+                    try {
+                        if (Files.isDirectory(path)) return;
+
+                        Path relative = sourceFolder.relativize(path);
+                        zos.putNextEntry(new ZipEntry(relative.toString()));
+                        Files.copy(path, zos);
+                        zos.closeEntry();
+
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
+            }
+        }
+
+        //deleteFolderRecursively(sourceFolder);
+    }
+
+
+
+    private static void deleteFolderRecursively(Path path) throws IOException {
+        if (!Files.exists(path)) return;
+
+        try (var walk = Files.walk(path)) {
+            walk.sorted(Comparator.reverseOrder())
+                    .forEach(p -> {
+                        try {
+                            Files.deleteIfExists(p);
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
         }
     }
 }

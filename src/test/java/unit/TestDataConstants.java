@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 
 public final class TestDataConstants {
 
-    public static final Path ACTUAL_OUTPUT_DIR = Paths.get("src/main/resources/outputs");
+    public static final Path ACTUAL_OUTPUT_DIR = Paths.get("/Users/ninja/Desktop/test/output");
 
     public static final String SINGLE_ORACLE_BACKUP_JOB = """
             {
