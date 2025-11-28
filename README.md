@@ -152,7 +152,8 @@ migration-platform/
 
 ---
 
-## Validation & Error Handling
+## Architecture
+<img width="1536" height="1024" alt="ChatGPT Image Nov 28, 2025, 02_51_42 PM" src="https://github.com/user-attachments/assets/97e4ddca-5866-47a1-a44a-3548b72e0568" />
 
 ### Validations Performed
 
