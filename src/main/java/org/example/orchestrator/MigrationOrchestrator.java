@@ -91,13 +91,15 @@ public class MigrationOrchestrator  implements AutoCloseable {
 
 
 
-    private void validateOrThrow(ExportDataDto export) {
-        ValidationResult validation = validator.validate(export);
+    private void validateOrThrow(ExportDataDto exportDataDto) {
+        ValidationResult validation = validator.validate(exportDataDto);
         log.info("Validation result:\n{}", validation);
+
         if (!validation.isValid()) {
             log.error("Validation failed. Migration aborted.");
             throw new ValidationException("Validation failed:\n" + validation);
         }
+
         log.info("Validation passed");
     }
 

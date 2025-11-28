@@ -55,10 +55,6 @@ public class TriggerMigrationService {
         Set<Class<? extends TriggerHandler>> handlerClasses = reflections.getSubTypesOf(TriggerHandler.class);
 
         for (Class<? extends TriggerHandler> handlerClass : handlerClasses) {
-            if (handlerClass.isInterface()) {
-                continue;
-            }
-
             instantiateAndRegister(handlerClass);
         }
 
