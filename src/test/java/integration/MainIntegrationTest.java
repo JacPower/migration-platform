@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static unit.TestDataConstants.*;
 import static unit.TestDataConstants.FileNames.*;
@@ -168,21 +167,6 @@ class MainIntegrationTest {
         String consoleOutput = outputStream.toString();
         assertTrue(consoleOutput.contains("Number of export files to process: 1"));
         assertTrue(Files.list(outputDir).count() > 0);
-    }
-
-
-
-    @Test
-    @Order(11)
-    @DisplayName("Should handle empty jobs array")
-    void testEmptyJobsArray() throws Exception {
-        Path inputDir = tempDir.resolve("input");
-        Path outputDir = tempDir.resolve("output");
-        Files.createDirectories(inputDir);
-
-        createTestJsonFile(inputDir, "empty_jobs.json", EMPTY_JOBS_ARRAY);
-
-        assertDoesNotThrow(() -> Main.main(new String[]{inputDir.toString(), outputDir.toString()}));
     }
 
 

@@ -1,10 +1,10 @@
 package org.example.validator;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.dto.internal.ValidationResult;
-import org.example.dto.input.ExportDataDto;
 import org.example.dto.input.DependencyDto;
+import org.example.dto.input.ExportDataDto;
 import org.example.dto.input.JobDto;
+import org.example.dto.internal.ValidationResult;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,22 +46,20 @@ public class JobDependencyValidator {
         return jobs.stream()
                 .collect(Collectors.toMap(
                         JobDto::getJobId,
-                job -> job.getDependencies().stream()
-                        .map(DependencyDto::getDependsOnJobId)
-                        .toList()
-        ));
+                        job -> job.getDependencies().stream()
+                                .map(DependencyDto::getDependsOnJobId)
+                                .toList()
+                ));
     }
 
 
 
     private void validateReferences(Map<Integer, List<Integer>> graph, Set<Integer> jobIds, ValidationResult result) {
-        for (Map.Entry<Integer, List<Integer>> entry : graph.entrySet()) {
-            for (Integer depId : entry.getValue()) {
-                if (!jobIds.contains(depId)) {
-                    result.addError("Job " + entry.getKey() + " depends on non-existent job " + depId);
-                }
-            }
-        }
+        graph.forEach((jobId, dependencies) ->
+                dependencies.stream()
+                        .filter(depId -> !jobIds.contains(depId))
+                        .forEach(depId -> result.addError("Job " + jobId + " depends on non-existent job " + depId))
+        );
     }
 
 

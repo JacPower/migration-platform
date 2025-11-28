@@ -51,7 +51,7 @@ public class MigrationOrchestrator  implements AutoCloseable {
 
 
     public void migrate(List<String> filePaths) throws IOException {
-        if(filePaths.size() ==1) {
+        if(filePaths.size() == 1) {
             long start = System.currentTimeMillis();
             log.info("Starting migration from file: {}", filePaths.get(0));
 
